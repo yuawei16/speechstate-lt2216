@@ -39,6 +39,9 @@ interface SDSContext {
     title: string;
     day:   string;
     time:  string;
+    userName:   string;
+    famousPersonName:   string;
+    personSpec: string;
 }
 
 type SDSEvent =
