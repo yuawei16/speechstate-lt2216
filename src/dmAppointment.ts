@@ -15,11 +15,13 @@ function say(text: string): Action<SDSContext, SDSEvent> {
 const grammar: { [index: string]: { title?: string, day?: string, time?: string, userName?: string, famousPersonName?: string} } = {
     "Lecture.": { title: "Dialogue systems lecture" },
     "Lunch.": { title: "Lunch at the canteen" },
+    "CelebrityMetting": {title: "Meeting with Jackie Chan"},
     "Monday": { day: "Monday" },
     "10:30": { time: "10:30" },
     "Jack": {userName: "Jack"},
     "famousPerson": {famousPersonName: "Jackie Chan"}
 }
+
 
 
 const kbRequest = (text: string) =>
@@ -45,7 +47,8 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                 RECOGNISED: [
                     {
                         target: 'openning',
-                        actions: assign({ title: (context) => grammar[context.recResult[0].utterance].userName! })
+                        actions: [assign({ userName: (context) => grammar[context.recResult[0].utterance].userName! }),
+                                    (context) => console.log("Here's the userName", context.userName)]
                     },
                     {
                         target: '.nomatch'
@@ -133,7 +136,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             initial: 'prompt',
             states: {
                 prompt: {
-                    entry: say("Here we go."),
+                    entry: say("Let me check."),
                     on: { ENDSPEECH: 'getPerson' }
                 },
                 getPerson: {
@@ -169,7 +172,9 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                 RECOGNISED: [
                     {
                         target: 'date',
-                        cond: (context) => context.recResult[0].utterance === 'Yes.'
+                        cond: (context) => context.recResult[0].utterance === 'Yes.',
+                        actions: [assign({ title: (context) => "meeting with" + context.famousPersonName} ),
+                                    (context) => console.log(context.title)]
 
                     },
                     {
@@ -180,7 +185,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    entry: say("Do you want to meet" + grammar.famousPersonName),
+                    entry: say("Do you want to meet" + grammar["famousPerson"].famousPersonName),
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
@@ -227,9 +232,8 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                 RECOGNISED: [
                     {
                         target: 'daypart',
-                        // cond: (context) => "title" in (grammar[context.recResult[0].utterance] || {}),
-                        actions: [assign({ title: (context) => grammar[context.recResult[0].utterance].day! }),
-                                (grammar) => console.log(grammar)]
+                        actions: [assign({ day: (context) => grammar[context.recResult[0].utterance].day! }),
+                                (context) => console.log("Date Step", context)]
                     },
                     {
                         target: '.nomatch'
@@ -289,7 +293,6 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                 RECOGNISED: [
                     {
                         target: 'meetingConfirmationPartDay',
-                        // cond: (context) => "day" in (grammar[context.recResult[0].utterance] || {}),
                         actions: [assign({ title: (context) => grammar[context.recResult[0].utterance].time! }),
                                   (grammar) => console.log(grammar)]
                     },
@@ -318,11 +321,6 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             on: {
                 RECOGNISED: [
                     {
-                        target: 'finalConfirmation',
-                        // cond: (context) => "day" in (grammar[context.recResult[0].utterance] || {}),
-                        // actions: assign({ time: (context) => grammar[context.recResult[0].utterance].time! })
-                    },
-                    {
                         target: 'meetingWelcome',
                         cond: (context) => context.recResult[0].utterance === 'No.'
                     },
@@ -338,7 +336,8 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    entry: say("Do you want to create a meeting titled" + grammar["Lunch."].title + "on" + grammar["Monday"].day + "at" + grammar["10:30"].time + "?"),
+                    entry: say("Do you want to create a meeting titled" + grammar["Lunch."].title 
+                                + "on" + grammar["Monday"].day + "at" + grammar["10:30"].time + "?"), // Question: how to get the tile, day, time from value from context instead?
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
@@ -355,17 +354,12 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             on: {
                 RECOGNISED: [
                     {
-                        target: 'finalConfirmation',
-                        // cond: (context) => "day" in (grammar[context.recResult[0].utterance] || {}),
-                        // actions: assign({ time: (context) => grammar[context.recResult[0].utterance].time! })
-                    },
-                    {
                         target: 'meetingWelcome',
                         cond: (context) => context.recResult[0].utterance === 'No.'
                     },
                     {
                         target: 'finalConfirmation',
-                        cond: (context) => context.recResult[0].utterance === 'Yes.'
+                        cond: (context) => context.recResult[0].utterance === 'Yes.',
                     },
                     {
                         target: '.nomatch'
@@ -375,7 +369,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    entry: say("Do you want to create a meeting titled" + grammar["Lunch."].title + "on" + grammar["Monday"].day + "?"),
+                    entry: say("Do you want to create a meeting titled" + grammar["CelebrityMetting"].title + "on" + grammar["Monday"].day + "?"),
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
