@@ -12,6 +12,10 @@ function say(text: string): Action<SDSContext, SDSEvent> {
     return send((_context: SDSContext) => ({ type: "SPEAK", value: text }))
 }
 
+const sayAppointment: Action<SDSContext, SDSEvent> = send((context: SDSContext) => ({
+    type: "SPEAK", value: `Do you want to create a meeting titled ${context.title} on ${context.day}`
+}))
+
 const grammar: { [index: string]: { title?: string, day?: string, time?: string, userName?: string, famousPersonName?: string} } = {
     "Lecture.": { title: "Dialogue systems lecture" },
     "Lunch.": { title: "Lunch at the canteen" },
@@ -337,7 +341,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             states: {
                 prompt: {
                     entry: say("Do you want to create a meeting titled" + grammar["Lunch."].title 
-                                + "on" + grammar["Monday"].day + "at" + grammar["10:30"].time + "?"), // Question: how to get the tile, day, time from value from context instead?
+                               + "on" + grammar["Monday"].day + "at" + grammar["10:30"].time + "?"),
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
@@ -369,7 +373,8 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    entry: say("Do you want to create a meeting titled" + grammar["CelebrityMetting"].title + "on" + grammar["Monday"].day + "?"),
+                    // entry: say("Do you want to create a meeting titled" + grammar["CelebrityMetting"].title + "on" + grammar["Monday"].day + "?"),
+                    entry: sayAppointment,
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
