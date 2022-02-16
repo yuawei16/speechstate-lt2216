@@ -373,7 +373,6 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    // entry: say("Do you want to create a meeting titled" + grammar["CelebrityMetting"].title + "on" + grammar["Monday"].day + "?"),
                     entry: sayAppointment,
                     on: { ENDSPEECH: 'ask' }
                 },
