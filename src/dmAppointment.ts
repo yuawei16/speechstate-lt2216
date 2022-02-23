@@ -51,7 +51,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                 RECOGNISED: [
                     {
                         target: 'openning',
-                        actions: [assign({ userName: (context) => grammar[context.recResult[0].utterance].userName! }),
+                        actions: [assign({ userName: (context) => context.recResult[0].utterance}),
                                     (context) => console.log("Here's the userName", context.userName)]
                     },
                     {
@@ -84,7 +84,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                     },
                     {
                         target: 'meetingWithOther',
-                        cond: (context) => context.recResult[0].utterance === 'Another'
+                        cond: (context) => context.recResult[0].utterance === 'Another one.'
                     },
                     {
                         target: '.nomatch'
@@ -94,7 +94,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    entry: say("Hi," + grammar["Jack"].userName + "Do you want to create a meeting alone or with another one?"),
+                    entry: send((context: SDSContext) => ({type: "SPEAK", value: `Hi, ${context.userName}! Do you want to create a meeting alone or with another one?`})),
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
@@ -112,7 +112,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                 RECOGNISED: [
                     {
                         target: 'findPerson',
-                        actions: [assign({ famousPersonName: (context) => grammar["famousPerson"].famousPersonName! }),
+                        actions: [assign({ famousPersonName: (context) => context.recResult[0].utterance }),
                                     (context) => console.log(context.famousPersonName)]
                     },
                     {
@@ -146,7 +146,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
                 getPerson: {
                     invoke: {
                         id: 'getPerson',
-                        src: (grammar) => kbRequest(grammar.famousPersonName),
+                        src: (context) => kbRequest(context.famousPersonName),
                         onDone: {
                             target: 'success',
                             actions: [
@@ -189,7 +189,7 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    entry: say("Do you want to meet" + grammar["famousPerson"].famousPersonName),
+                    entry: send((context: SDSContext) => ({type: "SPEAK", value: `Do you want to meet ${context.famousPersonName}?`})),
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
@@ -340,8 +340,8 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
             },
             states: {
                 prompt: {
-                    entry: say("Do you want to create a meeting titled" + grammar["Lunch."].title 
-                               + "on" + grammar["Monday"].day + "at" + grammar["10:30"].time + "?"),
+                    entry: say("Do you want to create a meeting titled " + grammar["Lunch."].title
+                               + "on " + grammar["Monday"].day + "at " + grammar["10:30"].time + "?"),
                     on: { ENDSPEECH: 'ask' }
                 },
                 ask: {
