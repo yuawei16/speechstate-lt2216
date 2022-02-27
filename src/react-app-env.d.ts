@@ -44,6 +44,8 @@ interface SDSContext {
     userName:   string;
     famousPersonName:   string;
     personSpec: string;
+    counter: number;
+    confidence: number;
 }
 
 type SDSEvent =
@@ -58,4 +60,5 @@ type SDSEvent =
     | { type: 'ENDSPEECH' }
     | { type: 'LISTEN' }
     | { type: 'TIMEOUT' }
-    | { type: 'SPEAK', value: string };
+    | { type: 'SPEAK', value: string }
+    | { type: 'RECSTOP', value: string};
