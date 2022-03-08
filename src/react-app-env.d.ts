@@ -46,6 +46,7 @@ interface SDSContext {
     personSpec: string;
     counter: number;
     confidence: number;
+    intent: string;
 }
 
 type SDSEvent =

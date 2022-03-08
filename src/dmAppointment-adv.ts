@@ -65,5 +65,5 @@ export const dmMachine: MachineConfig<SDSContext, any, SDSEvent> = ({
     }
 })
 
-const kbRequest = (text: string) =>
-    fetch(new Request(`https://cors.eu.org/https://api.duckduckgo.com/?q=${text}&format=json&skip_disambig=1`)).then(data => data.json())
+// const kbRequest = (text: string) =>
+//     fetch(new Request(`https://cors.eu.org/https://api.duckduckgo.com/?q=${text}&format=json&skip_disambig=1`)).then(data => data.json())
